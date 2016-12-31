@@ -4,7 +4,7 @@ import json
 import time
 import os.path
 from datetime import date
-from constants import APP_KEY, APP_SECRET, ACCESS_TOKEN
+from reporter_api.constants import APP_KEY, APP_SECRET, ACCESS_TOKEN
 import dateutil.parser
 from itertools import groupby
 
@@ -340,36 +340,25 @@ class Snapshot(object):
                     answers[response["questionPrompt"]] = response["tokens"]
         return answers
 
-class Collector(object):
-    def __init__(self, reports, attributes):
-        self.__reports = attributes
-        self.__attributes = attributes
 
-    def conform(self):
-        cleanedCountries = [x for x in countries if x is not None]
-        countryDict = {}
-        for key, group in groupby(cleanedCountries):
-            countryDict[key] = len(list(group))
 
-if __name__ == "__main__":
-    fetcher = Fetcher()
-    reports = fetcher.getAllReports()
-    countries = []
 
-    for report in reports:
-        for snapshot in report.snapshots:
-            log(snapshot.date)
-            log(snapshot.responses)
-            log(snapshot.battery)
-            countries.append(snapshot.country)
-            log(snapshot.weight)
-            log(snapshot.altitude)
-            log(snapshot.connection)
-            log(snapshot.steps)
-            log(snapshot.humidity)
-            log(snapshot.tempC)
-            log(snapshot.weather)
-            print("\n\n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #    cleanedCountries = [x for x in countries if x is not None]
 #
