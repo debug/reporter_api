@@ -1,5 +1,4 @@
 import re
-import time
 import os.path
 import json
 import glob
@@ -14,14 +13,14 @@ from reporter_api.constants import ACCESS_TOKEN, APP_PATH
 
 DEBUG = True
 
-class Mode:
-    DROPBOX = 0
-    LOCAL = 1
-
-
 def log(msg):
     if DEBUG:
         print("reporter_api :: {0}".format(msg))
+
+
+class Mode:
+    DROPBOX = 0
+    LOCAL = 1
 
 
 class Reports(object):
@@ -29,12 +28,8 @@ class Reports(object):
     def __init__(self, mode=None):
         if mode == None:
             self.__mode = Mode.DROPBOX
-
         elif mode == Mode.LOCAL:
             self.__mode = Mode.LOCAL
-
-        elif mode == Mode.DROPBOX:
-            self.__mode = Mode.DROPBOX
 
         self.__setup()
 
@@ -42,6 +37,8 @@ class Reports(object):
         if self.__mode == 0:
             self.__db = dropbox.Dropbox(ACCESS_TOKEN)
             self.__listFolderObj = self.__db.files_list_folder("/{0}".format(APP_PATH))
+        else:
+            pass
 
     def __fetchLocal(self):
         reportObjs = []
@@ -49,25 +46,15 @@ class Reports(object):
         dropboxPath = os.path.join(str(home), "Dropbox", str(APP_PATH))
         files = glob.glob("{path}/*.json".format(path=dropboxPath))
 
-        if(DEBUG):
-            start = time.time()
-
         for file in tqdm(files):
             fh = open(file, 'r')
             data = json.loads(fh.read())
             reportObjs.append(Report(data, file))
 
-        end = time.time()
-        log("Query time :: " + str(end - start))
-
         return reportObjs
 
     def __fetchDropbox(self):
         reporterObjs = []
-
-        if(DEBUG):
-            start = time.time()
-
         for i in tqdm(self.__listFolderObj.entries):
             if os.path.splitext(i.path_display)[1] == ".json":
                 try:
@@ -77,11 +64,10 @@ class Reports(object):
                     return None
 
                 data = res.content
+                #print(data)
+                #print(type(data))
                 reporterObj = Report(json.loads(data))
                 reporterObjs.append(reporterObj)
-
-        end = time.time()
-        log("Query time :: " + str(end - start))
 
         return reporterObjs
 
@@ -92,15 +78,26 @@ class Reports(object):
         else:
             reports = self.__fetchLocal()
             pass
+        pass
 
         return reports
 
     @property
-    def latestReport(self):
+    def latestReport():
         """ Returns latest Report object """
+        folderMetadata = Fetcher.getClient("/Apps/Reporter-App")
+        if(DEBUG):
+            start = time.time()
 
-        if self.__mode == 0:
-            return Report(self.__listFolderObj.entries[-1])
+        for metaFile in reversed(folderMetadata["contents"]):
+            if os.path.splitext(metaFile["path"])[1] == Fetcher.FILE_SUFFIX:
+                f, metadata = CLIENT.get_file_and_metadata(metaFile["path"])
+                reportObj = Report(eval(f.read()))
+                end = time.time()
+                log("Query time :: " + str(end - start))
+                return reportObj
+
+        return None
 
 
 class Report(object):
@@ -323,5 +320,38 @@ class Snapshot(object):
         return self.__parent
 
 if __name__ == "__main__":
-    reports = Reports(Mode.DROPBOX)
-    reports.latestReport
+    reports = Reports(Mode.LOCAL)
+    #reports = Reports()
+    for r in reports.reportObjs:
+        for s in r.snapshots:
+            #s.responses['Who are you with?'])
+            #print(s.responses.keys())
+            if s.responses.has_key("Who are you with?"):
+                #print(s.responses)
+                #s.report.filePath)
+                if s.responses["Who are you with?"] != []:
+                    if isinstance(s.responses["Who are you with?"][0], dict):
+                        if s.responses["Who are you with?"][0].has_key(unicode("text")):
+                            try:
+                                if s.responses["Who are you with?"][0][unicode("text")] == unicode("No one"):
+                                    print(r.filePath)
+                            elif s.responses["Who are you with?"][0][unicode("text")] == unicode("Alone"):
+                                    print(r.filePath)
+
+                            except:
+                                print(s.responses["Who are you with?"][0])
+                    #if str(s.responses["Who are you with?"][0]) == "Alone":
+                    #    print(r.filePath)
+
+                #print("has it")
+            #else:
+                #print(s.responses)
+            #    pass
+                #print("doesn't")
+            #pp.pprint(s.responses)
+            #if s.responses.keys() != []:
+                #try:
+                #    print(s.responses[unicode('Who are you with?')])
+                #except:
+                #    print(s.responses.keys())
+    #reportObjs = fetcher.getAllReports()

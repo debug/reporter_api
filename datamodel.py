@@ -1,8 +1,12 @@
 import pandas as pd
-
+from itertools import groupby
+import numpy
 
 class ReportSeries(object):
     def __init__(self, reports, attributes):
+        if isinstance(reports, list) != True and isinstance(attributes, list) != True:
+            raise TypeError("arguments must be of type list()")
+
         self.__reports = attributes
         self.__attributes = attributes
 
@@ -13,4 +17,5 @@ class ReportSeries(object):
             countryDict[key] = len(list(group))
 
     def series(self):
-        s = pd.Series(np.random.randn(5), index=['a', 'b', 'c', 'd', 'e'])
+        series = pd.Series([10, 15, 20, 25, 30], index=['a', 'b', 'c', 'd', 'e'])
+        return series

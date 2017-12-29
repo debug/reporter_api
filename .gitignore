@@ -1,3 +1,7 @@
 *.pyc
 *~
 *.swp
+
+constants.py
+
+tests/graph.py
