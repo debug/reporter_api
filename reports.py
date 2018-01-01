@@ -24,7 +24,7 @@ def log(msg):
         print("reporter_api :: {0}".format(msg))
 
 
-class Reports(object):
+class Series(object):
 
     def __init__(self, mode=None):
         if mode == None:
@@ -48,6 +48,7 @@ class Reports(object):
         home = os.path.expanduser("~")
         dropboxPath = os.path.join(str(home), "Dropbox", str(APP_PATH))
         files = glob.glob("{path}/*.json".format(path=dropboxPath))
+        files.sort()
 
         if(DEBUG):
             start = time.time()
@@ -100,7 +101,9 @@ class Reports(object):
         """ Returns latest Report object """
 
         if self.__mode == 0:
-            return Report(self.__listFolderObj.entries[-1])
+            md, res = self.__db.files_download(self.__listFolderObj.entries[-1].path_display)
+            data = res.content
+            return Report(json.loads(data))
 
 
 class Report(object):
@@ -115,11 +118,6 @@ class Report(object):
         for snapshot in self.__data["snapshots"]:
             snapshotObj = Snapshot(snapshot, parent=self)
             self.__snapshots.append(snapshotObj)
-
-        #healthInfo = Fetcher.getHealthKit(self.date)
-        #if healthInfo != None:
-        #    for snapshot in self.__snapshots:
-        #        snapshot.weight = healthInfo['weight']
 
     @property
     def snapshots(self):
@@ -323,5 +321,5 @@ class Snapshot(object):
         return self.__parent
 
 if __name__ == "__main__":
-    reports = Reports(Mode.DROPBOX)
-    reports.latestReport
+    series = Series(Mode.DROPBOX)
+    series.latestReport
