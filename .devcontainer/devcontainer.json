@@ -1,0 +1,9 @@
+{"ghcr.io/itsmechlark/features/1password:1": {Dawall1101@}
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {"ghcr.io/devcontainers/features/aws-cli:1": {Dawall1101@}
+ {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/wxw-matt/devcontainer-features/apt:latest": {
+			"packages": "vim telnet curl"
+}}}}
